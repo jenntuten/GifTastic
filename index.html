@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+
+    <title>GifTastic</title>
+</head>
+
+<body>
+    <style>
+        body {
+            background: url("https://www.toptal.com/designers/subtlepatterns/patterns/light-grey-terrazzo.png");
+        }
+
+        .gif-wrapper {
+            min-height: 100%;
+            background: teal;
+            width: 70%;
+            margin-left: auto;
+            margin-right: auto;
+            left: 0;
+            right: 0;
+            padding: 10px;
+        }
+
+        .input-container {
+            float: right;
+            margin-bottom: 20px;
+        }
+
+        .character-btn {
+            clear: both;
+            padding: 5px;
+            margin: 5px;
+            border-radius: 3px;
+            font-size: 30px;
+            background: white;
+        }
+
+        .buttons {
+            clear: both;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .gifs {
+            border: none !important;
+        }
+        
+    </style>
+    <div class='gif-wrapper'>
+        <h3>The Office GIFs</h3>
+        <div class="input-container">
+            <input class="input"></input>
+            <button class="search">Search</button>
+        </div>
+
+        <div class="buttons"></div>
+        <div class="gifs"></div>
+    </div>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+    <script>
+        let searchQuery;
+        let topics = ["Michael", "Jim", "Pam", "Dwight"];
+        //Dynamically create buttons for default gifs.
+        for (let i = 0; i < topics.length; i++) {
+            console.log(topics[i]);
+            let character = $("<button>");
+            character.addClass("character-btn");
+            character.attr("data-characters", topics[i]);
+            character.text(topics[i]);
+            $(".buttons").append(character);
+        }
+        ///'button', ??
+        //animate gifs on click, and stop on next click
+        $('.character-btn').on('click', function () {
+            let gifChoice = $(this).attr("data-characters");
+            console.log(gifChoice);
+            let queryURL = "https://api.giphy.com/v1/gifs/search?api_key=p8MAnNXNx0XoiGDiV5HHkpVT8nnGV9wf&q=" + gifChoice + "%20the%20office&limit=10&offset=0&rating=G&lang=en";
+            //this function doesn't seem to be working. the data is being pulled but the loop isn't working, and extracted data isn't logged.
+            //trying one at a time
+            //unable to click on new character gifs
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            }).then(function (response) {
+                console.log('Query response: ', response);
+                console.log('response.data', response.data.length);
+                for (let j = 0; j < response.data.length; j++) {
+                    let dataURL = response.data[j].embed_url;
+                    let showGIF = '<iframe src="' + dataURL + '">';
+                    $('.gifs').append(showGIF);
+                    //trying to add rating
+                    let rating = $("<div>");
+
+                    $('.rating').append('rating');
+                    console.log("showgif:", showGIF);
+                }
+            });
+        })
+
+        $('.search').on('click', function () {
+            console.log('clicked');
+            searchQuery = $('.input').val();
+            console.log(searchQuery);
+            let newCharacter = $("<button>")
+            newCharacter.addClass("character-btn");
+            newCharacter.attr('data-characters', searchQuery);
+            newCharacter.text(searchQuery);
+            $('.buttons').append(newCharacter);
+        })
+    </script>
+</body>
+
+</html>
