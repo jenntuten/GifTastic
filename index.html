@@ -39,20 +39,36 @@
             clear: both;
             padding: 5px;
             margin: 5px;
-            border-radius: 3px;
+
             font-size: 30px;
             background: white;
+            border: none;
+            border-radius: 4px;
         }
 
         .buttons {
             clear: both;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
+
         }
-        .gifs {
-            border: none !important;
+
+        .gif-container {
+            clear: both;
+            display: grid;
+            grid-gap: 5px;
+            grid-template-rows: repeat(3, 1fr);
         }
-        
+
+        .ratings {
+
+
+            text-align: center;
+        }
+
+        iframe {
+            border: none;
+        }
     </style>
     <div class='gif-wrapper'>
         <h3>The Office GIFs</h3>
@@ -62,7 +78,13 @@
         </div>
 
         <div class="buttons"></div>
-        <div class="gifs"></div>
+        <div class="gif-container">
+            <div class="gifs"></div>
+            <div class="ratings"></div>
+
+        </div>
+        <!--<button class="test-button">Test</button>
+        <div class="test"></div> **Test button to load stills of each gif**-->
     </div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -76,7 +98,7 @@
         let topics = ["Michael", "Jim", "Pam", "Dwight"];
         //Dynamically create buttons for default gifs.
         for (let i = 0; i < topics.length; i++) {
-            console.log(topics[i]);
+            //console.log(topics[i]);
             let character = $("<button>");
             character.addClass("character-btn");
             character.attr("data-characters", topics[i]);
@@ -91,7 +113,7 @@
             let queryURL = "https://api.giphy.com/v1/gifs/search?api_key=p8MAnNXNx0XoiGDiV5HHkpVT8nnGV9wf&q=" + gifChoice + "%20the%20office&limit=10&offset=0&rating=G&lang=en";
             //this function doesn't seem to be working. the data is being pulled but the loop isn't working, and extracted data isn't logged.
             //trying one at a time
-            //unable to click on new character gifs
+
             $.ajax({
                 url: queryURL,
                 method: "GET"
@@ -100,17 +122,18 @@
                 console.log('response.data', response.data.length);
                 for (let j = 0; j < response.data.length; j++) {
                     let dataURL = response.data[j].embed_url;
+                    console.log('dataURL: ', dataURL);
                     let showGIF = '<iframe src="' + dataURL + '">';
                     $('.gifs').append(showGIF);
-                    //trying to add rating
-                    let rating = $("<div>");
 
-                    $('.rating').append('rating');
-                    console.log("showgif:", showGIF);
+                    //trying to add rating, but it just shows 10x in one place.
+                    let rating = response.data[j].rating;
+                    //$('.ratings').append(rating);
+                    console.log("rating:", rating);
                 }
             });
         })
-
+        //new character buttons not working
         $('.search').on('click', function () {
             console.log('clicked');
             searchQuery = $('.input').val();
@@ -120,6 +143,24 @@
             newCharacter.attr('data-characters', searchQuery);
             newCharacter.text(searchQuery);
             $('.buttons').append(newCharacter);
+        })
+        //still images not generating when this test button is clicked. getting object Object
+        $('.test-button').on('click', function () {
+            let testQuery = "https://api.giphy.com/v1/gifs/search?api_key=p8MAnNXNx0XoiGDiV5HHkpVT8nnGV9wf&q=jim%20the%20office&limit=10&offset=0&rating=G&lang=en";
+            $.ajax({
+                url: testQuery,
+                method: "GET"
+            }).then(function (response) {
+                console.log('testQuery response: ', response);
+                console.log('response.data.length: ', response.data.length);
+                for (let k = 0; k < response.data.length; k++) {
+                    let testURL = response.data[k].images.fixed_height_small_still.url;
+                    console.log("Test URL: ", testURL);
+                    let showStillGIF = '<iframe src="' + testURL + '">';
+                    $('.gifs').append(showStillGIF);
+                    //this works but shows a scroll bar and the via Giphy text... need to disable the redirect to Giphy when clicked.
+                }
+            });
         })
     </script>
 </body>
