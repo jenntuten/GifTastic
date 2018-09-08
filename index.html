@@ -60,7 +60,7 @@
             grid-template-rows: repeat(3, 1fr);
         }
 
-        .ratings {
+        .rating {
 
 
             text-align: center;
@@ -95,7 +95,8 @@
         crossorigin="anonymous"></script>
     <script>
         let searchQuery;
-        let topics = ["Michael", "Jim", "Pam", "Dwight"];
+
+        let topics = ["Michael", "Jim", "Dwight"];
         //Dynamically create buttons for default gifs.
         for (let i = 0; i < topics.length; i++) {
             //console.log(topics[i]);
@@ -105,46 +106,50 @@
             character.text(topics[i]);
             $(".buttons").append(character);
         }
-        ///'button', ??
-        //animate gifs on click, and stop on next click
-        $('.character-btn').on('click', function () {
-            let gifChoice = $(this).attr("data-characters");
-            console.log(gifChoice);
-            let queryURL = "https://api.giphy.com/v1/gifs/search?api_key=p8MAnNXNx0XoiGDiV5HHkpVT8nnGV9wf&q=" + gifChoice + "%20the%20office&limit=10&offset=0&rating=G&lang=en";
-            //this function doesn't seem to be working. the data is being pulled but the loop isn't working, and extracted data isn't logged.
-            //trying one at a time
 
+        //***animate gifs on click, and stop on next click**
+
+        //Create buttons for new characters.
+        $('.search').on('click', function () {
+            console.log('search clicked');
+            searchQuery = $('.input').val();
+            //console.log(searchQuery);
+            let newCharacter = $("<button>")
+            newCharacter.addClass("character-btn");
+            newCharacter.attr('data-characters', searchQuery);
+            newCharacter.text(searchQuery);
+            $('.buttons').append(newCharacter);
+
+        })
+        //Applies to existing buttons and new character buttons that weren't in the original array. 
+        //Tried to push to topics array but it only loaded gifs for the original array.
+        $('body').on('click', '.character-btn', function () {
+            console.log('new character button clicked');
+            let gifChoice = $(this).attr("data-characters");
+            console.log('GIF: ', gifChoice);
+            let queryURL = "https://api.giphy.com/v1/gifs/search?api_key=p8MAnNXNx0XoiGDiV5HHkpVT8nnGV9wf&q=" + gifChoice + "%20the%20office&limit=10&offset=0&rating=G&lang=en";
             $.ajax({
                 url: queryURL,
                 method: "GET"
             }).then(function (response) {
                 console.log('Query response: ', response);
                 console.log('response.data', response.data.length);
-                for (let j = 0; j < response.data.length; j++) {
-                    let dataURL = response.data[j].embed_url;
-                    console.log('dataURL: ', dataURL);
+                for (let n = 0; n < response.data.length; n++) {
+                    let dataURL = response.data[n].embed_url;
+                    //console.log('DataURL: ', dataURL);
                     let showGIF = '<iframe src="' + dataURL + '">';
                     $('.gifs').append(showGIF);
 
-                    //trying to add rating, but it just shows 10x in one place.
-                    let rating = response.data[j].rating;
-                    //$('.ratings').append(rating);
-                    console.log("rating:", rating);
+                    //trying to add rating, but it just shows 10x, then 9x, 8x, etc. to the right of each gif. 
+                    //With each fix it either stays the same or the rating disappears.
+                    let rating = response.data[n].rating;
+                    $('iframe').attr('data-rating', rating);
+                    let showRating = $(this).attr("data-rating");
+                    console.log("showRating:", showRating);
                 }
             });
         })
-        //new character buttons not working
-        $('.search').on('click', function () {
-            console.log('clicked');
-            searchQuery = $('.input').val();
-            console.log(searchQuery);
-            let newCharacter = $("<button>")
-            newCharacter.addClass("character-btn");
-            newCharacter.attr('data-characters', searchQuery);
-            newCharacter.text(searchQuery);
-            $('.buttons').append(newCharacter);
-        })
-        //still images not generating when this test button is clicked. getting object Object
+        //this works but shows a scroll bar and the via Giphy text... need to disable the redirect to Giphy when clicked.
         $('.test-button').on('click', function () {
             let testQuery = "https://api.giphy.com/v1/gifs/search?api_key=p8MAnNXNx0XoiGDiV5HHkpVT8nnGV9wf&q=jim%20the%20office&limit=10&offset=0&rating=G&lang=en";
             $.ajax({
@@ -158,7 +163,7 @@
                     console.log("Test URL: ", testURL);
                     let showStillGIF = '<iframe src="' + testURL + '">';
                     $('.gifs').append(showStillGIF);
-                    //this works but shows a scroll bar and the via Giphy text... need to disable the redirect to Giphy when clicked.
+
                 }
             });
         })
